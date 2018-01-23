@@ -2,157 +2,172 @@ package managers;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.swing.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 
 /**
- * Created by Lance Judan on 1/21/2018.
+ * Created by Lance Judan on 1/22/2018
  */
 public class FileManager {
-    private static final String ALGORITHM = "AES";
-    private static final int KEY_LENGTH = 256;
+    private static final String ALGORITHM = "AES",
+            SAVE_DIRECTORY = "Card Manager", SALT_PATH = "salt.enc", IV_PATH = "iv.enc";
+    private static final int KEY_LENGTH = 128, ITERATIONS = 6215;
+    private static final SecureRandom secureRandom = new SecureRandom();
 
-    public static Serializable loadFile(String fileName) {
-        String path = getFilePath(fileName);
+    public static boolean saveFile(String password, Serializable object, String fileName) {
         try {
-            if (new File(path).exists()) {
-                Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
-                CipherInputStream cipherInputStream = new CipherInputStream(new FileInputStream(path), cipher);
-                ObjectInputStream in = new ObjectInputStream(cipherInputStream);
-                SealedObject sealedObject = (SealedObject) in.readObject();
-                Serializable input = (Serializable) sealedObject.getObject(cipher);
-                in.close();
-                return input;
-            }
+            File saveDirectory = getFolder();
+            if (saveDirectory.exists() || saveDirectory.mkdir()) {
+                File file = getFile(fileName);
+                Cipher cipher = getCipher(password, Cipher.ENCRYPT_MODE);
+                SealedObject sealedObject = new SealedObject(object, cipher);
+                CipherOutputStream cipherOutputStream = new CipherOutputStream(new BufferedOutputStream(new FileOutputStream(file)), cipher);
+                ObjectOutputStream out = new ObjectOutputStream(cipherOutputStream);
+                out.writeObject(sealedObject);
+                out.close();
+                return true;
+            } else
+                return false;
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not load " + fileName + "\n\n" + e.toString(), "Error: Failed to Load", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
+            return false;
+        }
+    }
+
+    public static Serializable loadFile(String password, String fileName) {
+        try {
+            File loadFile = getFile(fileName);
+            if (loadFile.exists()) {
+                Cipher cipher = getCipher(password, Cipher.DECRYPT_MODE);
+                CipherInputStream cipherInputStream = new CipherInputStream(new BufferedInputStream(new FileInputStream(loadFile)), cipher);
+                ObjectInputStream in = new ObjectInputStream(cipherInputStream);
+                SealedObject sealedObject = (SealedObject) in.readObject();
+                in.close();
+                return (Serializable) sealedObject.getObject(cipher);
+            }
+        } catch (IOException | ClassNotFoundException | BadPaddingException | IllegalBlockSizeException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
-    public static void saveFile(Serializable object, String fileName) {
-        File tempFolder = new File(getFolderPath());
+    private static boolean generateSalt() {
         try {
-            //Makes sure "Card Manager" folder exists before saving
-            if (!tempFolder.exists() || tempFolder.mkdir()) {
-                throw new Exception();
-            }
-            Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
-            SealedObject sealedObject = new SealedObject(object, cipher);
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(new FileOutputStream(getFilePath(fileName)), cipher);
-            ObjectOutputStream out = new ObjectOutputStream(cipherOutputStream);
-            out.writeObject(sealedObject);
-            out.close();
-        } catch (Exception e) {
+            byte[] salt = new byte[KEY_LENGTH / 8];
+            secureRandom.nextBytes(salt);
+            write(salt, getFile(SALT_PATH));
+            return true;
+        } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not save " + fileName + "\n\n" + e.toString(), "Error: Failed to Save", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
-    //Returns the absolute path of the "Card Manager" directory based on operating system located in the user's
-    // documents directory
+    private static byte[] getSalt() {
+        File saltFile = getFile(SALT_PATH);
+        if (saltFile.exists() || generateSalt()) {
+            try {
+                return read(KEY_LENGTH / 8, saltFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private static boolean generateIVBytes() {
+        try {
+            byte[] iv = new byte[KEY_LENGTH / 8];
+            secureRandom.nextBytes(iv);
+            write(iv, getFile(IV_PATH));
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static IvParameterSpec getIVParameterSpec() {
+        File ivFile = getFile(IV_PATH);
+        if (ivFile.exists() || generateIVBytes()) {
+            try {
+                byte[] iv = read(KEY_LENGTH / 8, ivFile);
+                return new IvParameterSpec(iv);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private static void write(byte[] bytes, File file) throws IOException {
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(bytes);
+        out.close();
+    }
+
+    private static byte[] read(int arrayLength, File file) throws IOException {
+        byte[] bytes = new byte[arrayLength];
+        FileInputStream in = new FileInputStream(file);
+        in.read(bytes);
+        in.close();
+        return bytes;
+    }
+
+    private static SecretKeySpec getSecretKeySpec(String password) {
+        try {
+            System.out.println(getSalt().length);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            KeySpec keySpec = new PBEKeySpec(password.toCharArray(), getSalt(), ITERATIONS, KEY_LENGTH);
+            SecretKey temp = factory.generateSecret(keySpec);
+            return new SecretKeySpec(temp.getEncoded(), ALGORITHM);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static Cipher getCipher(String password, int mode) {
+        try {
+            SecretKeySpec secretKeySpec = getSecretKeySpec(password);
+            IvParameterSpec ivParameterSpec = getIVParameterSpec();
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            switch (mode) {
+                case Cipher.ENCRYPT_MODE:
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+                    break;
+                case Cipher.DECRYPT_MODE:
+                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+                    break;
+            }
+            return cipher;
+        } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | NoSuchAlgorithmException | InvalidKeyException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //Returns the "Card Manager" directory based on operating system located in the user's documents directory
     private static String getFolderPath() {
         String osName = System.getProperty("os.name");
         String path = System.getProperty("user.home");
-        path += osName.equalsIgnoreCase("Linux") ? "/Documents/Card Manager/" : "\\Documents\\Card Manager\\";
+        path += osName.equalsIgnoreCase("Linux") ? "/Documents/" + SAVE_DIRECTORY + "/" : "\\Documents\\" + SAVE_DIRECTORY + "\\";
         return path;
     }
 
-    //Returns the absolute path of file located in "Card Manager" directory
-    private static String getFilePath(String fileName) {
-        return getFolderPath() + fileName;
+    private static File getFolder() {
+        return new File(getFolderPath());
     }
 
-    //Returns cipher initialized to the specified mode
-    private static Cipher getCipher(int mode) {
-        Cipher cipher = null;
-        if (loadSecretKey() == null || loadIV() == null) {
-            generateSecretKey();
-            generateIV();
-        }
-        SecretKey secretKey = loadSecretKey();
-        IvParameterSpec ivParameterSpec = loadIV();
-
-        try {
-            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            switch (mode) {
-                case Cipher.ENCRYPT_MODE:
-                    cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-                    break;
-                case Cipher.DECRYPT_MODE:
-                    cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
-                    break;
-            }
-        } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();
-            String modeString = mode == 1 ? "Encrypt Mode" : "Decrypt Mode";
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not create cipher in " + modeString + "\n\n" + e.toString(), "Error: Failed to Create Cipher in " + modeString, JOptionPane.ERROR_MESSAGE);
-            System.exit(2);
-        }
-        return cipher;
-    }
-
-    private static void generateIV() {
-        byte[] iv = new byte[KEY_LENGTH/8];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(iv);
-        try {
-            FileOutputStream out = new FileOutputStream(getFilePath("IV Spec"));
-            out.write(iv);
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not save Initilization Vector\n\n" + e.toString(), "Error: Failed to Generate Initialization Vector", JOptionPane.ERROR_MESSAGE);
-            System.exit(3);
-        }
-    }
-
-    private static IvParameterSpec loadIV() {
-        try {
-            byte[] iv = Files.readAllBytes(Paths.get(getFilePath("IV Spec")));
-            return new IvParameterSpec(iv);
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not load Initilization Vector\n\n" + e.toString(), "Error: Failed to Load Initialization Vector", JOptionPane.ERROR_MESSAGE);
-            System.exit(4);
-        }
-        return null;
-    }
-
-    private static void generateSecretKey() {
-        try {
-            KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
-            keyGenerator.init(KEY_LENGTH);
-            SecretKey secretKey = keyGenerator.generateKey();
-            byte[] keyBytes = secretKey.getEncoded();
-            FileOutputStream out = new FileOutputStream(getFilePath("Secret Key"));
-            out.write(keyBytes);
-            out.close();
-        } catch (NoSuchAlgorithmException | IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not save Secret Key\n\n" + e.toString(), "Error: Failed to Generate Secret Key", JOptionPane.ERROR_MESSAGE);
-            System.exit(5);
-        }
-    }
-
-    private static SecretKey loadSecretKey() {
-        try {
-            byte[] keyBytes = Files.readAllBytes(Paths.get(getFilePath("Secret Key")));
-            return new SecretKeySpec(keyBytes, ALGORITHM);
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Could not load Secret Key\n\n" + e.toString(), "Error: Failed to Load Secret Key", JOptionPane.ERROR_MESSAGE);
-            System.exit(6);
-        }
-        return null;
+    //Returns the file located in "Card Manager" directory
+    private static File getFile(String fileName) {
+        return new File(getFolderPath() + fileName);
     }
 }
