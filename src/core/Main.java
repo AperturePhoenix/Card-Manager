@@ -8,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import managers.CardManager;
-import managers.FileManager;
 
 import java.util.Optional;
 
@@ -16,15 +15,20 @@ import java.util.Optional;
  * Created by Lance Judan on 1/21/2018
  */
 public class Main extends Application {
-    CardManager cardManager;
+    private CardManager cardManager;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         cardManager = new CardManager(getPassword());
+    }
+
+    @Override
+    public void stop() {
+        cardManager.exit();
     }
 
     private String getPassword() {
@@ -48,13 +52,11 @@ public class Main extends Application {
         Node loginButton = loginDialog.getDialogPane().lookupButton(loginButtonType);
         loginButton.setDisable(true);
 
-        passwordField.textProperty().addListener(((observable, oldValue, newValue) -> {
-            loginButton.setDisable(newValue.trim().isEmpty());
-        }));
+        passwordField.textProperty().addListener(((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty())));
 
         loginDialog.getDialogPane().setContent(grid);
 
-        Platform.runLater(() -> passwordField.requestFocus());
+        Platform.runLater(passwordField::requestFocus);
 
         loginDialog.setResultConverter(dialogButton -> {
             if (dialogButton == loginButtonType) {
@@ -64,9 +66,6 @@ public class Main extends Application {
         });
 
         Optional<String> password = loginDialog.showAndWait();
-        if (password.isPresent()) {
-            return password.get();
-        }
-        return null;
+        return password.orElse(null);
     }
 }

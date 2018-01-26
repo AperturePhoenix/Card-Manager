@@ -9,4 +9,8 @@ public class CardManager {
     public CardManager(String password) {
         this.password = password;
     }
+
+    public void exit() {
+
+    }
 }
