@@ -40,7 +40,7 @@ public class FileManager {
         }
     }
 
-    public static <T> Optional<ArrayList<T>> loadFile(String password, Class<T> type, String fileName) {
+    public static <T> Optional<ArrayList<T>> loadFile(String password, Class<T> type, String fileName) throws IOException {
         try {
             File loadFile = getFile(fileName);
             if (loadFile.exists()) {
@@ -52,7 +52,7 @@ public class FileManager {
                 ArrayList<T> array = (ArrayList<T>) sealedObject.getObject(cipher);
                 return Optional.of(array);
             }
-        } catch (IOException | ClassNotFoundException | BadPaddingException | IllegalBlockSizeException e) {
+        } catch (ClassNotFoundException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
         return Optional.empty();

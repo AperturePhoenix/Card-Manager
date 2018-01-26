@@ -20,12 +20,12 @@ public class CardManager {
     private ArrayList<Card> cards;
 
     public CardManager() {
-        this.password = getPassword();
-        load();
+        this.password = getPassword(null);
+        cards = loadCards();
     }
 
     public void changePassword() {
-        getPassword();
+        getPassword(null);
     }
 
     public ArrayList<Card> getCards() {
@@ -40,18 +40,26 @@ public class CardManager {
         cards.remove(card);
     }
 
-    private void load() {
-        Optional<ArrayList<Card>> optionalCard = FileManager.loadFile(password, Card.class, CARDS_FILE_NAME);
-        cards = optionalCard.orElse(new ArrayList<>());
+    private ArrayList<Card> loadCards() {
+        Optional<ArrayList<Card>> optionalCard = null;
+        while (optionalCard == null) {
+            try {
+                optionalCard = FileManager.loadFile(password, Card.class, CARDS_FILE_NAME);
+            } catch (Exception e) {
+                getPassword("Incorrect Password");
+            }
+        }
+        return optionalCard.orElse(new ArrayList<>());
     }
 
     public void exit() {
         FileManager.saveFile(password, cards, CARDS_FILE_NAME);
     }
 
-    private String getPassword() {
+    private String getPassword(String header) {
         Dialog<String> loginDialog = new Dialog<>();
         loginDialog.setTitle("Login");
+        if (header != null) loginDialog.setHeaderText(header);
 
         ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
         loginDialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
@@ -80,6 +88,7 @@ public class CardManager {
             if (dialogButton == loginButtonType) {
                 return passwordField.getText();
             }
+            System.exit(0);
             return null;
         });
 
