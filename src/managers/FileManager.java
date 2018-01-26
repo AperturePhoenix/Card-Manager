@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.ArrayList;
 
 /**
  * Created by Lance Judan on 1/22/2018
@@ -41,7 +42,7 @@ public class FileManager {
         }
     }
 
-    public static Serializable loadFile(String password, String fileName) {
+    public static <T> ArrayList<T> loadFile(String password, Class<T> type, String fileName) {
         try {
             File loadFile = getFile(fileName);
             if (loadFile.exists()) {
@@ -50,12 +51,12 @@ public class FileManager {
                 ObjectInputStream in = new ObjectInputStream(cipherInputStream);
                 SealedObject sealedObject = (SealedObject) in.readObject();
                 in.close();
-                return (Serializable) sealedObject.getObject(cipher);
+                return (ArrayList<T>) sealedObject.getObject(cipher);
             }
         } catch (IOException | ClassNotFoundException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private static boolean generateSalt() {
@@ -123,7 +124,6 @@ public class FileManager {
 
     private static SecretKeySpec getSecretKeySpec(String password) {
         try {
-            System.out.println(getSalt().length);
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec keySpec = new PBEKeySpec(password.toCharArray(), getSalt(), ITERATIONS, KEY_LENGTH);
             SecretKey temp = factory.generateSecret(keySpec);
