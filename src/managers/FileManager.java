@@ -12,6 +12,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * Created by Lance Judan on 1/22/2018
@@ -22,7 +23,7 @@ public class FileManager {
     private static final int KEY_LENGTH = 128, ITERATIONS = 6215;
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    public static boolean saveFile(String password, Serializable object, String fileName) {
+    public static void saveFile(String password, Serializable object, String fileName) {
         try {
             File saveDirectory = getFolder();
             if (saveDirectory.exists() || saveDirectory.mkdir()) {
@@ -33,16 +34,13 @@ public class FileManager {
                 ObjectOutputStream out = new ObjectOutputStream(cipherOutputStream);
                 out.writeObject(sealedObject);
                 out.close();
-                return true;
-            } else
-                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
     }
 
-    public static <T> ArrayList<T> loadFile(String password, Class<T> type, String fileName) {
+    public static <T> Optional<ArrayList<T>> loadFile(String password, Class<T> type, String fileName) {
         try {
             File loadFile = getFile(fileName);
             if (loadFile.exists()) {
@@ -51,12 +49,13 @@ public class FileManager {
                 ObjectInputStream in = new ObjectInputStream(cipherInputStream);
                 SealedObject sealedObject = (SealedObject) in.readObject();
                 in.close();
-                return (ArrayList<T>) sealedObject.getObject(cipher);
+                ArrayList<T> array = (ArrayList<T>) sealedObject.getObject(cipher);
+                return Optional.of(array);
             }
         } catch (IOException | ClassNotFoundException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return Optional.empty();
     }
 
     private static boolean generateSalt() {

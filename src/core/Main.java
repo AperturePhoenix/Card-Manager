@@ -23,49 +23,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        cardManager = new CardManager(getPassword());
+        cardManager = new CardManager();
     }
 
     @Override
     public void stop() {
         cardManager.exit();
-    }
-
-    private String getPassword() {
-        Dialog<String> loginDialog = new Dialog<>();
-        loginDialog.setTitle("Login");
-
-        ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
-        loginDialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 10, 10, 10));
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
-
-        grid.add(new Label("Password:"), 0, 0);
-        grid.add(passwordField, 1, 0);
-
-        Node loginButton = loginDialog.getDialogPane().lookupButton(loginButtonType);
-        loginButton.setDisable(true);
-
-        passwordField.textProperty().addListener(((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty())));
-
-        loginDialog.getDialogPane().setContent(grid);
-
-        Platform.runLater(passwordField::requestFocus);
-
-        loginDialog.setResultConverter(dialogButton -> {
-            if (dialogButton == loginButtonType) {
-                return passwordField.getText();
-            }
-            return null;
-        });
-
-        Optional<String> password = loginDialog.showAndWait();
-        return password.orElse(null);
     }
 }
