@@ -21,7 +21,7 @@ public class GiftCard extends Card {
         if (!(card instanceof GiftCard) || compareValue != 0)
             return compareValue;
         else
-            return id - ((GiftCard)card).id;
+            return id - ((GiftCard) card).id;
     }
 
     public int getId() {

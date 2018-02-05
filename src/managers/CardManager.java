@@ -26,6 +26,7 @@ public class CardManager {
 
     public void changePassword() {
         getPassword(null);
+        FileManager.generateKeys();
     }
 
     public ArrayList<Card> getCards() {

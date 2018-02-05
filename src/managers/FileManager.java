@@ -18,10 +18,11 @@ import java.util.Optional;
  * Created by Lance Judan on 1/22/2018
  */
 public class FileManager {
-    private static final String ALGORITHM = "AES",
-            SAVE_DIRECTORY = "Card Manager", SALT_PATH = "salt.enc", IV_PATH = "iv.enc";
-    private static final int KEY_LENGTH = 128, ITERATIONS = 6215;
+    private static final String ALGORITHM = "AES";
+    private static final int KEY_LENGTH = 128, ITERATIONS = 4287;
     private static final SecureRandom secureRandom = new SecureRandom();
+
+    private static final String SAVE_DIRECTORY = "Card Manager", SALT_PATH = "salt.enc", IV_PATH = "iv.enc";
 
     public static void saveFile(String password, Serializable object, String fileName) {
         try {
@@ -168,5 +169,10 @@ public class FileManager {
     //Returns the file located in "Card Manager" directory
     private static File getFile(String fileName) {
         return new File(getFolderPath() + fileName);
+    }
+
+    public static void generateKeys() {
+        generateIVBytes();
+        generateSalt();
     }
 }
