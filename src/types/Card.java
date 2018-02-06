@@ -19,6 +19,9 @@ public abstract class Card implements Comparable<Card>, Serializable {
         return name.compareTo(card.name);
     }
 
+    @Override
+    public String toString() { return name; }
+
     public String getName() {
         return name;
     }

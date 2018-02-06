@@ -24,6 +24,11 @@ public class GiftCard extends Card {
             return id - ((GiftCard) card).id;
     }
 
+    @Override
+    public String toString() {
+        return name + " ($" + amount + ")";
+    }
+
     public int getId() {
         return id;
     }
