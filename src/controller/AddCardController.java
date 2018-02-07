@@ -54,7 +54,7 @@ public class AddCardController extends Controller {
                         cardManager.addCard(new DebitCard(company, number, expiration, option));
                         break;
                     case "Gift":
-                        double amount = Double.parseDouble(option.replaceAll("\\$", ""));
+                        double amount = Double.parseDouble(option.replaceAll("[^0-9.]", ""));
                         cardManager.addCard(new GiftCard(company, number, amount));
                         break;
                 }

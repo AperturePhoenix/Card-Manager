@@ -26,7 +26,7 @@
         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2">
             <children>
                 <ChoiceBox fx:id="cardTypeChoiceBox" prefWidth="75.0" />
-                <TextField fx:id="optionTextField" alignment="CENTER" promptText="CVV" />
+                <TextField fx:id="optionTextField" alignment="CENTER" />
             </children>
         </HBox>
         <TextField fx:id="cardExpirationTextField" alignment="CENTER" maxWidth="-Infinity" prefWidth="200.0" promptText="Expiration" visible="false" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />

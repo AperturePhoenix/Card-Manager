@@ -20,14 +20,12 @@ public abstract class Card implements Comparable<Card>, Serializable {
     }
 
     @Override
-    public String toString() { return name; }
-
-    public String getName() {
+    public String toString() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public String getNumber() {

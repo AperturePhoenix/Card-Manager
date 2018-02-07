@@ -73,7 +73,7 @@
                         <TextField fx:id="expirationTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="100.0" promptText="Expiration" />
                      </children>
                   </HBox>
-                  <TextField fx:id="amountTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" promptText="Amount" visible="false" />
+                  <TextField fx:id="amountTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" promptText="Amount" visible="false" />
                </children>
             </StackPane>
                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="3">
