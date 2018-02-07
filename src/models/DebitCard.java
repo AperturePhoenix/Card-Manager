@@ -1,4 +1,4 @@
-package types;
+package models;
 
 /**
  * Created by Lance Judan on 1/21/2018

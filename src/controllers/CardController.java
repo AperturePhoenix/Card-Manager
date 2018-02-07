@@ -1,4 +1,4 @@
-package controller;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,10 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import types.Card;
-import types.CreditCard;
-import types.DebitCard;
-import types.GiftCard;
+import models.Card;
+import models.CreditCard;
+import models.DebitCard;
+import models.GiftCard;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -23,7 +23,7 @@ public class CardController extends Controller {
     @FXML
     Label cardCompanyLabel, cardTypeLabel;
     @FXML
-    TextField cardNumberTextField, CVVTextField, expirationTextField, amountTextField;
+    TextField searchTextField, cardNumberTextField, CVVTextField, expirationTextField, amountTextField;
     @FXML
     ListView<Card> cardListView;
     @FXML
@@ -36,35 +36,40 @@ public class CardController extends Controller {
         cardListView.setItems(cardManager.getCards());
         cardListView.setOnMouseClicked(value -> updateInformation());
 
+        searchTextField.setOnKeyReleased(value -> search());
+
         cardNumberTextField.setOnKeyPressed(value -> updateOptions());
         CVVTextField.setOnKeyPressed(value -> updateOptions());
         expirationTextField.setOnKeyPressed(value -> updateOptions());
         amountTextField.setOnKeyPressed(value -> updateOptions());
 
-        addButton.setOnAction((event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/AddCardView.fxml"));
-            loader.setRoot(new GridPane());
-            Parent root = new GridPane();
-            try {
-                root = loader.load();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            Stage stage = new Stage();
-            stage.setTitle("Add Card");
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-        }));
+        addButton.setOnAction((event -> createNewCard()));
         addButton.setTooltip(new Tooltip("Add new card"));
         removeButton.setOnAction(event -> cardManager.removeCard(getSelectedCard()));
         removeButton.setTooltip(new Tooltip("Remove selected card"));
         saveButton.setOnMouseClicked(event -> updateCard());
+        saveButton.setTooltip(new Tooltip("Save changes to the card"));
         cancelButton.setOnMouseClicked(event -> updateInformation());
+        cancelButton.setTooltip(new Tooltip("Cancel changes to the card"));
+    }
+
+    private void search() {
+        String searchString = searchTextField.getText().toLowerCase();
+        cardListView.setItems(cardManager.getCards(card -> card.getName().toLowerCase().contains(searchString) || card.getNumber().toLowerCase().endsWith(searchString)));
     }
 
     private void updateInformation() {
         Card selectedCard = getSelectedCard();
+        if (selectedCard == null) {
+            cardCompanyLabel.setText("Card Company");
+            cardTypeLabel.setText("Card Type");
+            cardNumberTextField.clear();
+            CVVTextField.clear();
+            expirationTextField.clear();
+            amountTextField.clear();
+            setEditButtonsDisabled(true);
+            return;
+        }
         cardCompanyLabel.setText(selectedCard.getName());
         cardNumberTextField.setText(selectedCard.getNumber());
         if (selectedCard instanceof GiftCard) {
@@ -107,7 +112,7 @@ public class CardController extends Controller {
         }
         else if (selectedCard instanceof CreditCard) {
             ((CreditCard)selectedCard).setCVV(CVVTextField.getText().trim());
-            ((CreditCard)selectedCard).setExpiration(expirationTextField.getText().replaceAll("[0-9\\/]", "").trim());
+            ((CreditCard)selectedCard).setExpiration(expirationTextField.getText().replaceAll("[0-9/]", "").trim());
         }
         updateInformation();
         setEditButtonsDisabled(true);
@@ -128,6 +133,22 @@ public class CardController extends Controller {
             boolean expiration = !expirationTextField.getText().equals(((DebitCard) selectedCard).getExpiration());
             return number || cvv || expiration;
         }
+    }
+
+    private void createNewCard() {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/AddCardView.fxml"));
+        loader.setRoot(new GridPane());
+        Parent root = new GridPane();
+        try {
+            root = loader.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Stage stage = new Stage();
+        stage.setTitle("Add Card");
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
     }
 
     private void setEditButtonsDisabled(boolean isDisabled) {

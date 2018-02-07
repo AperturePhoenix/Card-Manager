@@ -1,4 +1,4 @@
-package managers;
+package models.managers;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -7,10 +7,11 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import types.Card;
+import models.Card;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Created by Lance Judan on 1/25/2018
@@ -41,8 +42,30 @@ public class CardManager {
         return cards;
     }
 
+    public ObservableList<Card> getCards(Predicate<Card> predicate) {
+        return cards.filtered(predicate);
+    }
+
     public void addCard(Card card) {
-        cards.add(card);
+        cards.add(findInsertionPoint(card), card);
+    }
+
+    private int binarySearch(Card card) {
+        int low = 0, high = cards.size() - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            int compareValue = cards.get(mid).compareTo(card);
+            if (compareValue < 0) low = mid + 1;
+            else if (compareValue > 0) high = mid - 1;
+            else return mid;
+        }
+        return -(low + 1);
+    }
+
+    private int findInsertionPoint(Card card) {
+        int insertionPoint = binarySearch(card);
+        if (insertionPoint < 0) insertionPoint = -(insertionPoint + 1);
+        return insertionPoint;
     }
 
     public void removeCard(Card card) {
@@ -55,16 +78,10 @@ public class CardManager {
             try {
                 optionalCard = FileManager.loadFile(password, Card.class, CARDS_FILE_NAME);
             } catch (Exception e) {
-                getPassword("Incorrect Password");
+                password = getPassword("Incorrect Password");
             }
         }
         return FXCollections.observableArrayList(optionalCard.orElse(new ArrayList<>()));
-    }
-
-    public void exit() {
-        ArrayList<Card> temp = new ArrayList<>(cards);
-        FileManager.saveFile(password, temp, CARDS_FILE_NAME);
-
     }
 
     private String getPassword(String header) {
@@ -105,5 +122,11 @@ public class CardManager {
 
         Optional<String> password = loginDialog.showAndWait();
         return password.orElse(null);
+    }
+
+    public void exit() {
+        ArrayList<Card> temp = new ArrayList<>(cards);
+        FileManager.saveFile(password, temp, CARDS_FILE_NAME);
+
     }
 }

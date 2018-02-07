@@ -1,4 +1,4 @@
-package managers;
+package models.managers;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;

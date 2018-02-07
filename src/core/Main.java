@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
-import managers.CardManager;
+import models.managers.CardManager;
 
 /**
  * Created by Lance Judan on 1/21/2018

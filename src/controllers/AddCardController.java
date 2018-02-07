@@ -1,4 +1,4 @@
-package controller;
+package controllers;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -6,9 +6,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import types.CreditCard;
-import types.DebitCard;
-import types.GiftCard;
+import models.CreditCard;
+import models.DebitCard;
+import models.GiftCard;
 
 import java.net.URL;
 import java.util.ResourceBundle;

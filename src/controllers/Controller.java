@@ -1,7 +1,7 @@
-package controller;
+package controllers;
 
 import javafx.fxml.Initializable;
-import managers.CardManager;
+import models.managers.CardManager;
 
 /**
  * Created by Lance Judan on 1/25/2018
