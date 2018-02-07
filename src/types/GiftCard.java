@@ -4,12 +4,10 @@ package types;
  * Created by Lance Judan on 1/21/2018
  */
 public class GiftCard extends Card {
-    private int id;
     private double amount;
 
-    public GiftCard(String name, String number, int id, double amount) {
+    public GiftCard(String name, String number, double amount) {
         super(name, number);
-        this.id = id;
         this.amount = amount;
     }
 
@@ -21,16 +19,12 @@ public class GiftCard extends Card {
         if (!(card instanceof GiftCard) || compareValue != 0)
             return compareValue;
         else
-            return id - ((GiftCard) card).id;
+            return (int)(amount - ((GiftCard) card).amount);
     }
 
     @Override
     public String toString() {
         return name + " ($" + amount + ")";
-    }
-
-    public int getId() {
-        return id;
     }
 
     public double getAmount() {

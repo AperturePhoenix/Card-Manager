@@ -9,7 +9,7 @@ import managers.CardManager;
 public abstract class Controller implements Initializable {
     protected CardManager cardManager;
 
-    public void setCardManager(CardManager cardManager) {
-        this.cardManager = cardManager;
+    public Controller() {
+        cardManager = CardManager.getInstance();
     }
 }

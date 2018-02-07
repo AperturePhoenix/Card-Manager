@@ -1,6 +1,8 @@
 package managers;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -16,12 +18,18 @@ import java.util.Optional;
 public class CardManager {
     private static final String CARDS_FILE_NAME = "cards.ser";
 
+    private static CardManager cardManagerInstance = null;
     private String password;
-    private ArrayList<Card> cards;
+    private ObservableList<Card> cards;
 
-    public CardManager() {
+    private CardManager() {
         this.password = getPassword(null);
         cards = loadCards();
+    }
+
+    public static CardManager getInstance() {
+        if (cardManagerInstance == null) cardManagerInstance = new CardManager();
+        return cardManagerInstance;
     }
 
     public void changePassword() {
@@ -29,7 +37,7 @@ public class CardManager {
         FileManager.generateKeys();
     }
 
-    public ArrayList<Card> getCards() {
+    public ObservableList<Card> getCards() {
         return cards;
     }
 
@@ -41,7 +49,7 @@ public class CardManager {
         cards.remove(card);
     }
 
-    private ArrayList<Card> loadCards() {
+    private ObservableList<Card> loadCards() {
         Optional<ArrayList<Card>> optionalCard = null;
         while (optionalCard == null) {
             try {
@@ -50,11 +58,13 @@ public class CardManager {
                 getPassword("Incorrect Password");
             }
         }
-        return optionalCard.orElse(new ArrayList<>());
+        return FXCollections.observableArrayList(optionalCard.orElse(new ArrayList<>()));
     }
 
     public void exit() {
-        FileManager.saveFile(password, cards, CARDS_FILE_NAME);
+        ArrayList<Card> temp = new ArrayList<>(cards);
+        FileManager.saveFile(password, temp, CARDS_FILE_NAME);
+
     }
 
     private String getPassword(String header) {

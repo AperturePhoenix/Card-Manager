@@ -20,4 +20,12 @@ public class DebitCard extends Card {
     public void setExpiration(String expiration) {
         this.expiration = expiration;
     }
+
+    public String getCVV() {
+        return CVV;
+    }
+
+    public void setCVV(String CVV) {
+        this.CVV = CVV;
+    }
 }
