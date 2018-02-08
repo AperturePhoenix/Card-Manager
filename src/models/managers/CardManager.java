@@ -18,39 +18,35 @@ import java.util.function.Predicate;
  */
 public class CardManager {
     private static final String CARDS_FILE_NAME = "cards.ser";
-
     private static CardManager cardManagerInstance = null;
+
     private String password;
     private ObservableList<Card> cards;
-
-    private CardManager() {
-        this.password = getPassword(PasswordType.NORMAL);
-        cards = loadCards();
-    }
 
     public static CardManager getInstance() {
         if (cardManagerInstance == null) cardManagerInstance = new CardManager();
         return cardManagerInstance;
     }
 
-    public void changePassword() {
-        password = getPassword(PasswordType.CHANGE);
-        FileManager.generateKeys();
+    private CardManager() {
+        this.password = getPassword(PasswordType.NORMAL);
+        cards = loadCards();
     }
 
     public ObservableList<Card> getCards() {
         return cards;
     }
 
-    public ObservableList<Card> getCards(Predicate<Card> predicate) {
-        return cards.filtered(predicate);
+    public ObservableList<Card> getCards(Predicate<Card> filter) {
+        return cards.filtered(filter);
     }
 
     public void addCard(Card card) {
         cards.add(findInsertionPoint(card), card);
     }
 
-    private int binarySearch(Card card) {
+    //Uses a binary search algorithm to find where the Card should be inserted into the list
+    private int findInsertionPoint(Card card) {
         int low = 0, high = cards.size() - 1;
         while (low <= high) {
             int mid = (low + high) / 2;
@@ -59,13 +55,7 @@ public class CardManager {
             else if (compareValue > 0) high = mid - 1;
             else return mid;
         }
-        return -(low + 1);
-    }
-
-    private int findInsertionPoint(Card card) {
-        int insertionPoint = binarySearch(card);
-        if (insertionPoint < 0) insertionPoint = -(insertionPoint + 1);
-        return insertionPoint;
+        return low;
     }
 
     public void removeCard(Card card) {
@@ -82,6 +72,11 @@ public class CardManager {
             }
         }
         return FXCollections.observableArrayList(optionalCard.orElse(new ArrayList<>()));
+    }
+
+    public void changePassword() {
+        password = getPassword(PasswordType.CHANGE);
+        FileManager.generateKeys();
     }
 
     private String getPassword(PasswordType passwordType) {

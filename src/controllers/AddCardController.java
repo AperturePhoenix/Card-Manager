@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
  * Created by Lance Judan on 2/6/2018
  */
 public class AddCardController extends Controller {
+    //JavaFX Nodes
     @FXML
     TextField cardCompanyTextField, cardNumberTextField, cardExpirationTextField, optionTextField;
     @FXML
@@ -28,7 +29,6 @@ public class AddCardController extends Controller {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //Card Type Choice Box
         cardTypeChoiceBox.setItems(FXCollections.observableArrayList("Credit", "Debit", "Gift"));
         cardTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals("Gift")) {
@@ -45,7 +45,7 @@ public class AddCardController extends Controller {
                 String company = cardCompanyTextField.getText();
                 String number = cardNumberTextField.getText();
                 String expiration = cardExpirationTextField.getText();
-                String option = optionTextField.getText().trim();
+                String option = optionTextField.getText();
                 switch (cardTypeChoiceBox.getValue()) {
                     case "Credit":
                         cardManager.addCard(new CreditCard(company, number, expiration, option));
@@ -54,6 +54,7 @@ public class AddCardController extends Controller {
                         cardManager.addCard(new DebitCard(company, number, expiration, option));
                         break;
                     case "Gift":
+                        //Regular Expression removes any characters that are not digits or '.'
                         double amount = Double.parseDouble(option.replaceAll("[^0-9.]", ""));
                         cardManager.addCard(new GiftCard(company, number, amount));
                         break;

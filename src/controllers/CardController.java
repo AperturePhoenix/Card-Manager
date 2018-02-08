@@ -22,6 +22,7 @@ import java.util.ResourceBundle;
  * Created by Lance Judan on 1/25/2018
  */
 public class CardController extends Controller {
+    //JavaFX Nodes
     @FXML
     Label cardCompanyLabel, cardTypeLabel;
     @FXML
@@ -39,6 +40,7 @@ public class CardController extends Controller {
     public void initialize(URL location, ResourceBundle resources) {
         cardListView.setItems(cardManager.getCards());
         cardListView.setOnMouseClicked(value -> updateInformation());
+        //Allows the user to manipulate the list using keyboard
         cardListView.setOnKeyReleased(event -> {
             if (event.getCode() == KeyCode.DELETE) removeCard();
             if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) updateInformation();
@@ -52,6 +54,7 @@ public class CardController extends Controller {
         amountTextField.setOnKeyPressed(event -> updateOptions());
 
         passwordButton.setOnAction(event -> cardManager.changePassword());
+        passwordButton.setTooltip(new Tooltip("Change the password"));
         addButton.setOnAction((event -> createNewCard()));
         addButton.setTooltip(new Tooltip("Add new card"));
         removeButton.setOnAction(event -> removeCard());
@@ -59,9 +62,10 @@ public class CardController extends Controller {
         saveButton.setOnMouseClicked(event -> updateCard());
         saveButton.setTooltip(new Tooltip("Save changes to the card"));
         cancelButton.setOnMouseClicked(event -> updateInformation());
-        cancelButton.setTooltip(new Tooltip("Cancel changes to the card"));
+        cancelButton.setTooltip(new Tooltip("Discard changes to the card"));
     }
 
+    //Checks if the cards company name contains the search query or card number ends in the search query
     private void search() {
         String searchString = searchTextField.getText().toLowerCase();
         cardListView.setItems(cardManager.getCards(card -> card.getName().toLowerCase().contains(searchString) || card.getNumber().toLowerCase().endsWith(searchString)));
@@ -114,12 +118,14 @@ public class CardController extends Controller {
         Card selectedCard = getSelectedCard();
         selectedCard.setNumber(cardNumberTextField.getText().trim());
         if (selectedCard instanceof GiftCard) {
+            //Regular Expression removes any characters that are not digits or '.'
             String test = amountTextField.getText().replaceAll("[^0-9.]", "");
             System.out.println(test);
             double amount = Double.parseDouble(test);
             ((GiftCard) selectedCard).setAmount(amount);
         } else {
             String cvv = CVVTextField.getText().trim();
+            //Regular Expression removes any characters that are not digits or '/'
             String expiration = expirationTextField.getText().replaceAll("[^0-9/]", "").trim();
             if (selectedCard instanceof CreditCard) {
                 ((CreditCard) selectedCard).setCVV(cvv);
