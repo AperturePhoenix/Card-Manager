@@ -6,10 +6,10 @@ import models.managers.CardManager;
 /**
  * Created by Lance Judan on 1/25/2018
  */
-public abstract class Controller implements Initializable {
-    protected CardManager cardManager;
+abstract class Controller implements Initializable {
+    CardManager cardManager;
 
-    public Controller() {
+    Controller() {
         cardManager = CardManager.getInstance();
     }
 }

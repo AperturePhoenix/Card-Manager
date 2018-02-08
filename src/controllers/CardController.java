@@ -5,8 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.Card;
 import models.CreditCard;
@@ -27,25 +29,32 @@ public class CardController extends Controller {
     @FXML
     ListView<Card> cardListView;
     @FXML
-    Button addButton, removeButton, saveButton, cancelButton;
+    Button passwordButton, addButton, removeButton, saveButton, cancelButton;
     @FXML
     HBox cardHBox;
+    @FXML
+    VBox cardVBox;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cardListView.setItems(cardManager.getCards());
         cardListView.setOnMouseClicked(value -> updateInformation());
+        cardListView.setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.DELETE) removeCard();
+            if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) updateInformation();
+        });
 
-        searchTextField.setOnKeyReleased(value -> search());
+        searchTextField.setOnKeyReleased(event -> search());
 
-        cardNumberTextField.setOnKeyPressed(value -> updateOptions());
-        CVVTextField.setOnKeyPressed(value -> updateOptions());
-        expirationTextField.setOnKeyPressed(value -> updateOptions());
-        amountTextField.setOnKeyPressed(value -> updateOptions());
+        cardNumberTextField.setOnKeyPressed(event -> updateOptions());
+        CVVTextField.setOnKeyPressed(event -> updateOptions());
+        expirationTextField.setOnKeyPressed(event -> updateOptions());
+        amountTextField.setOnKeyPressed(event -> updateOptions());
 
+        passwordButton.setOnAction(event -> cardManager.changePassword());
         addButton.setOnAction((event -> createNewCard()));
         addButton.setTooltip(new Tooltip("Add new card"));
-        removeButton.setOnAction(event -> cardManager.removeCard(getSelectedCard()));
+        removeButton.setOnAction(event -> removeCard());
         removeButton.setTooltip(new Tooltip("Remove selected card"));
         saveButton.setOnMouseClicked(event -> updateCard());
         saveButton.setTooltip(new Tooltip("Save changes to the card"));
@@ -74,12 +83,12 @@ public class CardController extends Controller {
         cardNumberTextField.setText(selectedCard.getNumber());
         if (selectedCard instanceof GiftCard) {
             cardHBox.setVisible(false);
-            amountTextField.setVisible(true);
+            cardVBox.setVisible(true);
             cardTypeLabel.setText("Gift Card");
             amountTextField.setText("$" + ((GiftCard) selectedCard).getAmount());
         } else {
             cardHBox.setVisible(true);
-            amountTextField.setVisible(false);
+            cardVBox.setVisible(false);
             if (selectedCard instanceof CreditCard) {
                 cardTypeLabel.setText("Credit Card");
                 CVVTextField.setText(((CreditCard) selectedCard).getCVV());
@@ -108,11 +117,17 @@ public class CardController extends Controller {
             String test = amountTextField.getText().replaceAll("[^0-9.]", "");
             System.out.println(test);
             double amount = Double.parseDouble(test);
-            ((GiftCard)selectedCard).setAmount(amount);
-        }
-        else if (selectedCard instanceof CreditCard) {
-            ((CreditCard)selectedCard).setCVV(CVVTextField.getText().trim());
-            ((CreditCard)selectedCard).setExpiration(expirationTextField.getText().replaceAll("[0-9/]", "").trim());
+            ((GiftCard) selectedCard).setAmount(amount);
+        } else {
+            String cvv = CVVTextField.getText().trim();
+            String expiration = expirationTextField.getText().replaceAll("[^0-9/]", "").trim();
+            if (selectedCard instanceof CreditCard) {
+                ((CreditCard) selectedCard).setCVV(cvv);
+                ((CreditCard) selectedCard).setExpiration(expiration);
+            } else {
+                ((DebitCard) selectedCard).setCVV(cvv);
+                ((DebitCard) selectedCard).setExpiration(expiration);
+            }
         }
         updateInformation();
         setEditButtonsDisabled(true);
@@ -149,6 +164,10 @@ public class CardController extends Controller {
         stage.setTitle("Add Card");
         stage.setScene(new Scene(root));
         stage.showAndWait();
+    }
+
+    private void removeCard() {
+        cardManager.removeCard(getSelectedCard());
     }
 
     private void setEditButtonsDisabled(boolean isDisabled) {

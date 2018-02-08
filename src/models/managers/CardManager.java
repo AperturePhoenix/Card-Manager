@@ -24,7 +24,7 @@ public class CardManager {
     private ObservableList<Card> cards;
 
     private CardManager() {
-        this.password = getPassword(null);
+        this.password = getPassword(PasswordType.NORMAL);
         cards = loadCards();
     }
 
@@ -34,7 +34,7 @@ public class CardManager {
     }
 
     public void changePassword() {
-        getPassword(null);
+        password = getPassword(PasswordType.CHANGE);
         FileManager.generateKeys();
     }
 
@@ -78,18 +78,22 @@ public class CardManager {
             try {
                 optionalCard = FileManager.loadFile(password, Card.class, CARDS_FILE_NAME);
             } catch (Exception e) {
-                password = getPassword("Incorrect Password");
+                password = getPassword(PasswordType.INCORRECT);
             }
         }
         return FXCollections.observableArrayList(optionalCard.orElse(new ArrayList<>()));
     }
 
-    private String getPassword(String header) {
+    private String getPassword(PasswordType passwordType) {
         Dialog<String> loginDialog = new Dialog<>();
-        loginDialog.setTitle("Login");
+        String title = passwordType.getTitle();
+        String header = passwordType.getHeader();
+        String buttonText = passwordType.getButtonText();
+
+        loginDialog.setTitle(title);
         if (header != null) loginDialog.setHeaderText(header);
 
-        ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+        ButtonType loginButtonType = new ButtonType(buttonText, ButtonBar.ButtonData.OK_DONE);
         loginDialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -128,5 +132,31 @@ public class CardManager {
         ArrayList<Card> temp = new ArrayList<>(cards);
         FileManager.saveFile(password, temp, CARDS_FILE_NAME);
 
+    }
+
+    private enum PasswordType {
+        NORMAL("Login", null, "Login"),
+        INCORRECT("Error", "Incorrect Password", "Login"),
+        CHANGE("Change Password", "Enter New Password", "Change");
+
+        private final String title, header, buttonText;
+
+        PasswordType(String title, String header, String buttonText) {
+            this.title = title;
+            this.header = header;
+            this.buttonText = buttonText;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getHeader() {
+            return header;
+        }
+
+        public String getButtonText() {
+            return buttonText;
+        }
     }
 }

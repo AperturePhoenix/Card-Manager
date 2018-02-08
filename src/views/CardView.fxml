@@ -16,15 +16,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root dividerPositions="0.25" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="javafx.scene.control.SplitPane" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CardController">
+<fx:root dividerPositions="0.4" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" type="javafx.scene.control.SplitPane" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CardController">
     <items>
         <VBox>
             <children>
-                <HBox>
-                    <children>
-                        <TextField fx:id="searchTextField" promptText="Search" />
-                    </children>
-                </HBox>
+                <TextField fx:id="searchTextField" promptText="Search" />
                 <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER">
                     <content>
                         <ListView fx:id="cardListView" />
@@ -32,8 +28,10 @@
                 </ScrollPane>
                 <HBox alignment="TOP_RIGHT">
                     <children>
-                        <Button fx:id="addButton" mnemonicParsing="false" text="+" />
-                        <Button fx:id="removeButton" mnemonicParsing="false" prefWidth="25.0" text="-" />
+                        <Button fx:id="passwordButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="28.0" text="⚙" />
+                        <Separator prefWidth="200.0" visible="false" />
+                        <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="25.0" text="+" />
+                        <Button fx:id="removeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="25.0" text="-" />
                     </children>
                 </HBox>
             </children>
@@ -45,37 +43,73 @@
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-               <children>
-                      <Label fx:id="cardCompanyLabel" alignment="CENTER" contentDisplay="CENTER" text="Card Label">
-                          <font>
-                              <Font size="20.0" />
-                          </font>
-                      </Label>
-                  <Label fx:id="cardTypeLabel" text="Card Type">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
-                <TextField fx:id="cardNumberTextField" alignment="CENTER" maxWidth="-Infinity" prefWidth="200.0" promptText="Card Number" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.rowIndex="2">
-               <children>
-                  <HBox fx:id="cardHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <TextField fx:id="CVVTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="100.0" promptText="CVV" />
-                        <Separator prefWidth="15.0" visible="false" />
-                        <TextField fx:id="expirationTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="100.0" promptText="Expiration" />
-                     </children>
-                  </HBox>
-                  <TextField fx:id="amountTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" promptText="Amount" visible="false" />
-               </children>
-            </StackPane>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                    <children>
+                        <Label fx:id="cardCompanyLabel" alignment="CENTER" contentDisplay="CENTER" text="Card Label">
+                            <font>
+                                <Font size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="cardTypeLabel" text="Card Type">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
+                    <children>
+                        <TextField fx:id="cardNumberTextField" alignment="CENTER" maxWidth="-Infinity" prefWidth="200.0" promptText="Card Number" />
+                        <Label text="Card Number">
+                            <padding>
+                                <Insets top="5.0" />
+                            </padding>
+                        </Label>
+                    </children>
+                </VBox>
+                <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.rowIndex="2">
+                    <children>
+                        <VBox fx:id="cardVBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" visible="false">
+                            <children>
+                                <TextField fx:id="amountTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" promptText="Amount" />
+                                <Label text="Amount">
+                                    <padding>
+                                        <Insets top="5.0" />
+                                    </padding>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <HBox fx:id="cardHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <TextField fx:id="CVVTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="100.0" promptText="CVV" />
+                                        <Label text="CVV">
+                                            <padding>
+                                                <Insets top="5.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <Separator prefWidth="15.0" visible="false" />
+                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <TextField fx:id="expirationTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="100.0" promptText="Expiration" />
+                                        <Label text="Label">
+                                            <padding>
+                                                <Insets top="5.0" />
+                                            </padding>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </StackPane>
                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="3">
                     <children>
                         <Button fx:id="saveButton" disable="true" mnemonicParsing="false" prefWidth="52.0" text="Save">

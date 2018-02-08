@@ -24,7 +24,7 @@ public class GiftCard extends Card {
 
     @Override
     public String toString() {
-        return name + " ($" + amount + ")";
+        return getName() + " ($" + amount + ")";
     }
 
     public double getAmount() {
