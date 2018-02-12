@@ -126,7 +126,6 @@ public class CardManager {
     public void exit() {
         ArrayList<Card> temp = new ArrayList<>(cards);
         FileManager.saveFile(password, temp, CARDS_FILE_NAME);
-
     }
 
     private enum PasswordType {

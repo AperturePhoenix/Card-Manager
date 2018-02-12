@@ -28,4 +28,11 @@ public class DebitCard extends Card {
     public void setCVV(String CVV) {
         this.CVV = CVV;
     }
+
+    @Override
+    public void changeInfo(String[] info) {
+        setNumber(info[0]);
+        setCVV(info[1]);
+        setExpiration(info[2]);
+    }
 }

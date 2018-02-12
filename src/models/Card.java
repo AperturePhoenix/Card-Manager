@@ -35,4 +35,6 @@ public abstract class Card implements Comparable<Card>, Serializable {
     public void setNumber(String number) {
         this.number = number;
     }
+
+    public abstract void changeInfo(String[] info);
 }
