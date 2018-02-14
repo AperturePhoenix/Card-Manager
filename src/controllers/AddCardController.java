@@ -2,13 +2,9 @@ package controllers;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-import models.CreditCard;
-import models.DebitCard;
-import models.GiftCard;
+import models.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -54,9 +50,7 @@ public class AddCardController extends Controller {
                         cardManager.addCard(new DebitCard(company, number, expiration, option));
                         break;
                     case "Gift":
-                        //Regular Expression removes any characters that are not digits or '.'
-                        double amount = Double.parseDouble(option.replaceAll("[^0-9.]", ""));
-                        cardManager.addCard(new GiftCard(company, number, amount));
+                        cardManager.addCard(new GiftCard(company, number, option));
                         break;
                 }
                 ((Stage) addButton.getScene().getWindow()).close();
@@ -67,11 +61,22 @@ public class AddCardController extends Controller {
     }
 
     private boolean isFormFilledOut() {
+        String selectedType = cardTypeChoiceBox.getSelectionModel().getSelectedItem();
+        if (selectedType == null) {
+            Dialog error = new Dialog();
+            error.setTitle("Error");
+            error.setContentText("Please select card type");
+            ButtonType loginButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+            error.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+            error.showAndWait();
+            return false;
+        }
+
         boolean company = isFieldFilled(cardCompanyTextField);
         boolean number = isFieldFilled(cardNumberTextField);
         boolean expiration = isFieldFilled(cardExpirationTextField);
         boolean option = isFieldFilled(optionTextField);
-        if (cardTypeChoiceBox.getSelectionModel().getSelectedItem().equals("Gift"))
+        if (selectedType.equals("Gift"))
             return company && number && option;
         else
             return company && number && expiration && option;

@@ -6,13 +6,13 @@ package models;
 public class GiftCard extends Card {
     private double amount;
 
-    public GiftCard(String name, String number, double amount) {
+    public GiftCard(String name, String number, String amount) {
         super(name, number);
-        this.amount = amount;
+        setAmount(amount);
     }
 
-    //User can have many gift cards with for the same company ex: Amazon.
-    //If that is the case then must compare using ID instead of name
+    //User can have many gift cards with for the same company. If that is the case then must compare using amount
+    //remaining instead of company name
     @Override
     public int compareTo(Card card) {
         int compareValue = super.compareTo(card);
@@ -31,7 +31,25 @@ public class GiftCard extends Card {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    //Regular Expression removes any characters that are not digits or '.'
+    public void setAmount(String amount) {
+        this.amount = parseAmount(amount);
+    }
+
+    private double parseAmount(String amount) {
+        return Double.parseDouble(amount.replaceAll("[^0-9.]", ""));
+    }
+
+    @Override
+    public void changeInfo(String[] info) {
+        setNumber(info[InfoIndex.NUMBER]);
+        setAmount(info[InfoIndex.AMOUNT]);
+    }
+
+    @Override
+    public boolean hasInfoChanged(String[] info) {
+        boolean numberText = !number.equals(info[InfoIndex.NUMBER]);
+        boolean amountText = !(amount == parseAmount(info[InfoIndex.AMOUNT]));
+        return numberText || amountText;
     }
 }

@@ -31,8 +31,16 @@ public class CreditCard extends Card {
 
     @Override
     public void changeInfo(String[] info) {
-        setNumber(info[0]);
-        setCVV(info[1]);
-        setExpiration(info[2]);
+        setNumber(info[InfoIndex.NUMBER]);
+        setCVV(info[InfoIndex.CVV]);
+        setExpiration(info[InfoIndex.EXPIRATION]);
+    }
+
+    @Override
+    public boolean hasInfoChanged(String[] info) {
+        boolean numberText = !number.equals(info[InfoIndex.NUMBER]);
+        boolean cvvText = !CVV.equals(info[InfoIndex.CVV]);
+        boolean expirationText  = !expiration.equals(info[InfoIndex.EXPIRATION]);
+        return numberText || cvvText || expirationText;
     }
 }

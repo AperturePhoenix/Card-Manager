@@ -6,8 +6,8 @@ import java.io.Serializable;
  * Created by Lance Judan on 1/21/2018
  */
 public abstract class Card implements Comparable<Card>, Serializable {
-    private String name;
-    private String number;
+    protected String name;
+    protected String number;
 
     public Card(String name, String number) {
         this.name = name;
@@ -37,4 +37,13 @@ public abstract class Card implements Comparable<Card>, Serializable {
     }
 
     public abstract void changeInfo(String[] info);
+
+    public abstract boolean hasInfoChanged(String[] info);
+
+    protected class InfoIndex {
+        public static final int NUMBER = 0;
+        public static final int CVV = 1;
+        public static final int EXPIRATION = 2;
+        public static final int AMOUNT = 3;
+    }
 }

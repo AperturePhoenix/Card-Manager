@@ -44,21 +44,17 @@ public class FileManager {
 
     //Returns Optional<ArrayList<T>> which is a container object that may pass a null value when the file fails to load.
     //Allows the method caller to handle what happens if the file fails to load
-    public static <T> Optional<ArrayList<T>> loadFile(String password, Class<T> type, String fileName) throws IOException {
-        try {
-            File loadFile = getFile(fileName);
-            //Only tries to load if the file exists
-            if (loadFile.exists()) {
-                Cipher cipher = getCipher(password, Cipher.DECRYPT_MODE);
-                CipherInputStream cipherInputStream = new CipherInputStream(new BufferedInputStream(new FileInputStream(loadFile)), cipher);
-                ObjectInputStream in = new ObjectInputStream(cipherInputStream);
-                SealedObject sealedObject = (SealedObject) in.readObject();
-                in.close();
-                ArrayList<T> array = (ArrayList<T>) sealedObject.getObject(cipher);
-                return Optional.of(array);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static <T> Optional<ArrayList<T>> loadFile(String password, Class<T> type, String fileName) throws Exception {
+        File loadFile = getFile(fileName);
+        //Only tries to load if the file exists
+        if (loadFile.exists()) {
+            Cipher cipher = getCipher(password, Cipher.DECRYPT_MODE);
+            CipherInputStream cipherInputStream = new CipherInputStream(new BufferedInputStream(new FileInputStream(loadFile)), cipher);
+            ObjectInputStream in = new ObjectInputStream(cipherInputStream);
+            SealedObject sealedObject = (SealedObject) in.readObject();
+            in.close();
+            ArrayList<T> array = (ArrayList<T>) sealedObject.getObject(cipher);
+            return Optional.of(array);
         }
         return Optional.empty();
     }

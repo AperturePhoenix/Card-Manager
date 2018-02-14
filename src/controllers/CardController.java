@@ -48,10 +48,10 @@ public class CardController extends Controller {
 
         searchTextField.setOnKeyReleased(event -> search());
 
-        cardNumberTextField.setOnKeyPressed(event -> updateOptions());
-        CVVTextField.setOnKeyPressed(event -> updateOptions());
-        expirationTextField.setOnKeyPressed(event -> updateOptions());
-        amountTextField.setOnKeyPressed(event -> updateOptions());
+        cardNumberTextField.setOnKeyReleased(event -> updateOptions());
+        CVVTextField.setOnKeyReleased(event -> updateOptions());
+        expirationTextField.setOnKeyReleased(event -> updateOptions());
+        amountTextField.setOnKeyReleased(event -> updateOptions());
 
         passwordButton.setOnAction(event -> cardManager.changePassword());
         passwordButton.setTooltip(new Tooltip("Change the password"));
@@ -115,45 +115,13 @@ public class CardController extends Controller {
     }
 
     private void updateCard() {
-        Card selectedCard = getSelectedCard();
-        selectedCard.setNumber(cardNumberTextField.getText().trim());
-        if (selectedCard instanceof GiftCard) {
-            //Regular Expression removes any characters that are not digits or '.'
-            String test = amountTextField.getText().replaceAll("[^0-9.]", "");
-            System.out.println(test);
-            double amount = Double.parseDouble(test);
-            ((GiftCard) selectedCard).setAmount(amount);
-        } else {
-            String cvv = CVVTextField.getText().trim();
-            //Regular Expression removes any characters that are not digits or '/'
-            String expiration = expirationTextField.getText().replaceAll("[^0-9/]", "").trim();
-            if (selectedCard instanceof CreditCard) {
-                ((CreditCard) selectedCard).setCVV(cvv);
-                ((CreditCard) selectedCard).setExpiration(expiration);
-            } else {
-                ((DebitCard) selectedCard).setCVV(cvv);
-                ((DebitCard) selectedCard).setExpiration(expiration);
-            }
-        }
+        getSelectedCard().changeInfo(getTextFields());
         updateInformation();
         setEditButtonsDisabled(true);
     }
 
     private boolean hasCardChanged() {
-        Card selectedCard = getSelectedCard();
-        boolean number = !cardNumberTextField.getText().equals(selectedCard.getNumber());
-        if (selectedCard instanceof GiftCard) {
-            boolean amount = !amountTextField.getText().equals("$" + ((GiftCard) selectedCard).getAmount());
-            return number || amount;
-        } else if (selectedCard instanceof CreditCard) {
-            boolean cvv = !CVVTextField.getText().equals(((CreditCard) selectedCard).getCVV());
-            boolean expiration = !expirationTextField.getText().equals(((CreditCard) selectedCard).getExpiration());
-            return number || cvv || expiration;
-        } else {
-            boolean cvv = !CVVTextField.getText().equals(((DebitCard) selectedCard).getCVV());
-            boolean expiration = !expirationTextField.getText().equals(((DebitCard) selectedCard).getExpiration());
-            return number || cvv || expiration;
-        }
+        return getSelectedCard().hasInfoChanged(getTextFields());
     }
 
     private void createNewCard() {
@@ -183,5 +151,13 @@ public class CardController extends Controller {
 
     private Card getSelectedCard() {
         return cardListView.getSelectionModel().getSelectedItem();
+    }
+
+    private String[] getTextFields() {
+        String number = cardNumberTextField.getText().trim();
+        String cvv = CVVTextField.getText().trim();
+        String expiration = expirationTextField.getText().trim();
+        String amount = amountTextField.getText().trim();
+        return new String[] {number, cvv, expiration, amount};
     }
 }
