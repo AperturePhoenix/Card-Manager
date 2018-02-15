@@ -17,8 +17,9 @@ public class DebitCard extends Card {
         return expiration;
     }
 
+    //Regular Expression removes any characters that are not digits or '/'
     public void setExpiration(String expiration) {
-        this.expiration = expiration;
+        this.expiration = expiration.replaceAll("[^0-9/]", "");
     }
 
     public String getCVV() {

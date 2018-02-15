@@ -31,11 +31,11 @@ public class GiftCard extends Card {
         return amount;
     }
 
-    //Regular Expression removes any characters that are not digits or '.'
     public void setAmount(String amount) {
         this.amount = parseAmount(amount);
     }
 
+    //Regular Expression removes any characters that are not digits or '.'
     private double parseAmount(String amount) {
         return Double.parseDouble(amount.replaceAll("[^0-9.]", ""));
     }
