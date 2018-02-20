@@ -10,10 +10,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import models.Card;
-import models.CreditCard;
-import models.DebitCard;
-import models.GiftCard;
+import models.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -154,10 +151,11 @@ public class CardController extends Controller {
     }
 
     private String[] getTextFields() {
-        String number = cardNumberTextField.getText().trim();
-        String cvv = CVVTextField.getText().trim();
-        String expiration = expirationTextField.getText().trim();
-        String amount = amountTextField.getText().trim();
-        return new String[] {number, cvv, expiration, amount};
+        String[] info = new String[4];
+        info[InfoIndex.NUMBER] = cardNumberTextField.getText().trim();
+        info[InfoIndex.CVV] = CVVTextField.getText().trim();
+        info[InfoIndex.EXPIRATION] = expirationTextField.getText().trim();
+        info[InfoIndex.AMOUNT] = amountTextField.getText().trim();
+        return info;
     }
 }
