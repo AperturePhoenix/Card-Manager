@@ -15,11 +15,8 @@ import models.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * Created by Lance Judan on 1/25/2018
- */
 public class CardController extends Controller {
-    //JavaFX Nodes
+    //UI: JavaFX Nodes
     @FXML
     Label cardCompanyLabel, cardTypeLabel;
     @FXML

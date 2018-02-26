@@ -1,8 +1,5 @@
 package models;
 
-/**
- * Created by Lance Judan on 1/21/2018
- */
 public class DebitCard extends Card {
     private String expiration;
     private String CVV;

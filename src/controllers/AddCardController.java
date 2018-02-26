@@ -9,9 +9,6 @@ import models.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * Created by Lance Judan on 2/6/2018
- */
 public class AddCardController extends Controller {
     //JavaFX Nodes
     @FXML

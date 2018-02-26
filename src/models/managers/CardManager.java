@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-/**
- * Created by Lance Judan on 1/25/2018
- */
 public class CardManager {
     private static final String CARDS_FILE_NAME = "cards.ser";
     private static CardManager cardManagerInstance = null;

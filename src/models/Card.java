@@ -2,9 +2,6 @@ package models;
 
 import java.io.Serializable;
 
-/**
- * Created by Lance Judan on 1/21/2018
- */
 public abstract class Card implements Comparable<Card>, Serializable {
     protected String name;
     protected String number;

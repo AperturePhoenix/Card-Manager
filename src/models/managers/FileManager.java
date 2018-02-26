@@ -10,9 +10,6 @@ import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.Optional;
 
-/**
- * Created by Lance Judan on 1/22/2018
- */
 public class FileManager {
     //Encryption
     private static final String ALGORITHM = "AES";

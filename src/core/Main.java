@@ -8,9 +8,6 @@ import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
 import models.managers.CardManager;
 
-/**
- * Created by Lance Judan on 1/21/2018
- */
 public class Main extends Application {
     //Window variables
     private static final String TITLE = "Card Manager";
